@@ -651,3 +651,9 @@ main h2 {
 
   cursor: pointer;
 }
+
+.section-status {
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin-top: 16px;
+}

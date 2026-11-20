@@ -5,6 +5,7 @@ console.log("HYPE JS is working");
 // ==========================================
 
 const container = document.getElementById("for-you");
+const forYouStatus = document.getElementById("for-you-status");
 
 const exploreOverlay = document.getElementById("explore-overlay");
 const exploreImage = document.getElementById("explore-image");
@@ -12,19 +13,20 @@ const exploreTitle = document.getElementById("explore-title");
 const exploreDescription = document.getElementById("explore-description");
 const exploreRating = document.getElementById("explore-rating");
 const exploreEpisodes = document.getElementById("explore-episodes");
-const exploreGenre1 = document.getElementById("explore-genre-1");
-const exploreGenre2 = document.getElementById("explore-genre-2");
 const exploreGenres = document.getElementById("explore-genres");
 
 const exploreButton = document.querySelector(".featured button");
 const closeExplore = document.getElementById("close-explore");
 const addToWatchlistButton = document.querySelector(".primary-action");
+
 const watchlistContainer = document.getElementById("watchlist-container");
-
 const emptyWatchlist = document.getElementById("empty-watchlist");
-const watchlistToast = document.getElementById("watchlist-toast");
 
+const watchlistToast = document.getElementById("watchlist-toast");
 const undoButton = document.getElementById("undo-remove");
+
+const featuredTitle = document.getElementById("featured-title");
+const featuredDescription = document.getElementById("featured-description");
 
 let removedAnime = null;
 let removedIndex = -1;
@@ -93,6 +95,9 @@ fetch("https://graphql.anilist.co", {
 
     const animeList = data.data.Page.media;
 
+    // Hide loading message after successful response
+    forYouStatus.style.display = "none";
+
     // ==========================================
     // 4. CREATE ANIME CARDS
     // ==========================================
@@ -103,31 +108,31 @@ fetch("https://graphql.anilist.co", {
       card.classList.add("content-card");
 
       card.innerHTML = `
-                <div class="poster">
-                    <img
-                        src="${item.coverImage.large}"
-                        alt="${item.title.romaji}"
-                    >
+            <div class="poster">
+                <img
+                    src="${item.coverImage.large}"
+                    alt="${item.title.romaji}"
+                >
+            </div>
+
+            <div class="card-info">
+                <h3>${item.title.romaji}</h3>
+
+                <div class="anime-meta">
+                    <span>
+                        ⭐ ${
+                          item.averageScore
+                            ? (item.averageScore / 10).toFixed(1)
+                            : "N/A"
+                        }
+                    </span>
+
+                    <span>
+                        ${item.episodes ?? "Episodes TBA"} Episodes
+                    </span>
                 </div>
-
-                <div class="card-info">
-                    <h3>${item.title.romaji}</h3>
-
-                    <div class="anime-meta">
-                        <span>
-                            ⭐ ${
-                              item.averageScore
-                                ? (item.averageScore / 10).toFixed(1)
-                                : "N/A"
-                            }
-                        </span>
-
-                        <span>
-                            ${item.episodes ?? "Episodes TBA"} Episodes
-                        </span>
-                    </div>
-                </div>
-            `;
+            </div>
+        `;
 
       // ==========================================
       // 5. OPEN EXPLORE PANEL WHEN CARD IS CLICKED
@@ -142,8 +147,8 @@ fetch("https://graphql.anilist.co", {
           episodes: item.episodes,
           genres: item.genres,
         };
-        exploreImage.src = item.coverImage.large;
 
+        exploreImage.src = item.coverImage.large;
         exploreImage.alt = item.title.romaji;
 
         exploreTitle.textContent = item.title.romaji;
@@ -168,7 +173,7 @@ fetch("https://graphql.anilist.co", {
         });
 
         const alreadyAdded = watchlist.some(
-          (item) => item.id === selectedAnime.id,
+          (anime) => anime.id === selectedAnime.id,
         );
 
         addToWatchlistButton.textContent = alreadyAdded
@@ -180,13 +185,16 @@ fetch("https://graphql.anilist.co", {
         exploreOverlay.classList.add("active");
       });
 
-      // Add the completed card to the For You section
+      // Add completed card to For You section
       container.appendChild(card);
     });
   })
 
   .catch((error) => {
     console.error("AniList API Error:", error);
+
+    forYouStatus.textContent =
+      "Couldn't load recommendations. Please try again.";
   });
 
 // ==========================================
@@ -199,39 +207,48 @@ const anime = [
     title: "One Piece",
     image: null,
     episode: 1120,
-    rating: 9.1,
+    rating: 91,
     progress: 65,
+
     description:
       "The journey of Monkey D. Luffy and his crew as they search for the legendary One Piece.",
+
     episodes: "1120+ Episodes",
+
     genres: ["Action", "Adventure"],
   },
 
   {
     title: "Jujutsu Kaisen",
     episode: 48,
-    rating: 8.8,
+    rating: 88,
     progress: 40,
+
     description:
       "A world where cursed energy and supernatural battles shape the lives of powerful sorcerers.",
+
     episodes: "48 Episodes",
+
     genres: ["Action", "Fantasy"],
   },
 
   {
     title: "Attack on Titan",
     episode: 87,
-    rating: 9.0,
+    rating: 90,
     progress: 82,
+
     description:
       "Humanity fights for survival against mysterious giants beyond the walls.",
+
     episodes: "87 Episodes",
+
     genres: ["Action", "Drama"],
   },
 ];
 
 // ==========================================
-// 7. FETCH FEATURED ANIME POSTER
+// 7. FETCH DYNAMIC FEATURED ANIME
 // ==========================================
 
 fetch("https://graphql.anilist.co", {
@@ -244,13 +261,19 @@ fetch("https://graphql.anilist.co", {
   body: JSON.stringify({
     query: `
             query {
-                Media(id: 21, type: ANIME) {
-                    id
-                    title {
-                        romaji
-                    }
-                    coverImage {
-                        large
+                Page(perPage: 10) {
+                    media(type: ANIME, sort: POPULARITY_DESC) {
+                        id
+                        title {
+                            romaji
+                        }
+                        coverImage {
+                            large
+                        }
+                        description
+                        episodes
+                        averageScore
+                        genres
                     }
                 }
             }
@@ -266,21 +289,76 @@ fetch("https://graphql.anilist.co", {
   })
 
   .then((data) => {
+    // Check for GraphQL errors
     if (data.errors) {
       throw new Error(data.errors[0].message);
     }
 
-    const featuredData = data.data.Media;
+    // Get the list of popular anime
+    const featuredAnimeList = data.data.Page.media;
 
-    anime[0].image = featuredData.coverImage.large;
+    if (featuredAnimeList.length === 0) {
+      throw new Error("No featured anime found.");
+    }
 
-    // Update the currently selected anime
+    // ==========================================
+    // SELECT A RANDOM ANIME
+    // ==========================================
+
+    const randomIndex = Math.floor(Math.random() * featuredAnimeList.length);
+
+    const featuredData = featuredAnimeList[randomIndex];
+
+    // ==========================================
+    // UPDATE FEATURED ANIME DATA
+    // ==========================================
+
+    anime[0] = {
+      id: featuredData.id,
+
+      title: featuredData.title.romaji,
+
+      image: featuredData.coverImage.large,
+
+      episode: 0,
+
+      rating: featuredData.averageScore,
+
+      progress: 0,
+
+      description: featuredData.description
+        ? featuredData.description.replace(/<[^>]*>/g, "")
+        : "No description available.",
+
+      episodes: featuredData.episodes
+        ? `${featuredData.episodes} Episodes`
+        : "Episodes TBA",
+
+      genres: featuredData.genres,
+    };
+
+    // ==========================================
+    // UPDATE FEATURED HOMEPAGE CONTENT
+    // ==========================================
+
+    featuredTitle.textContent = anime[0].title;
+
+    featuredDescription.textContent = anime[0].description;
+
+    // ==========================================
+    // SYNCHRONIZE SELECTED ANIME
+    // ==========================================
+
     if (selectedAnime?.id === featuredData.id) {
       selectedAnime.image = featuredData.coverImage.large;
+
       exploreImage.src = featuredData.coverImage.large;
     }
 
-    // Update the saved Watchlist entry
+    // ==========================================
+    // SYNCHRONIZE WATCHLIST POSTER
+    // ==========================================
+
     const watchlistAnime = watchlist.find(
       (item) => item.id === featuredData.id,
     );
@@ -302,8 +380,7 @@ fetch("https://graphql.anilist.co", {
 // 8. FEATURED SECTION
 // ==========================================
 
-const featuredTitle = document.getElementById("featured-title");
-const featuredDescription = document.getElementById("featured-description");
+// Display temporary Featured data initially
 
 const featured = anime[0];
 
@@ -318,7 +395,7 @@ featuredDescription.textContent = featured.description;
 exploreButton.addEventListener("click", () => {
   const featured = anime[0];
 
-  // Store the currently selected anime
+  // Store currently selected anime
   selectedAnime = {
     id: featured.id,
     title: featured.title,
@@ -337,7 +414,9 @@ exploreButton.addEventListener("click", () => {
 
   exploreImage.alt = featured.title;
 
-  exploreRating.textContent = `⭐ ${featured.rating}`;
+  exploreRating.textContent = `⭐ ${
+    featured.rating ? (featured.rating / 10).toFixed(1) : "N/A"
+  }`;
 
   exploreEpisodes.textContent = featured.episodes;
 
@@ -394,7 +473,7 @@ addToWatchlistButton.addEventListener("click", () => {
 });
 
 // ==========================================
-// RENDER WATCHLIST
+// 12. RENDER WATCHLIST
 // ==========================================
 
 function renderWatchlist() {
@@ -402,6 +481,7 @@ function renderWatchlist() {
 
   if (watchlist.length === 0) {
     emptyWatchlist.classList.add("active");
+
     return;
   }
 
@@ -424,21 +504,29 @@ function renderWatchlist() {
                 <h3>${item.title}</h3>
 
                 <div class="anime-meta">
-                    <span>⭐ ${
-                      item.rating ? (item.rating / 10).toFixed(1) : "N/A"
-                    }</span>
+                    <span>
+                        ⭐ ${
+                          item.rating ? (item.rating / 10).toFixed(1) : "N/A"
+                        }
+                    </span>
 
-                    <span>${item.episodes ?? "Episodes TBA"}</span>
+                    <span>
+                        ${item.episodes ?? "Episodes TBA"}
+                    </span>
                 </div>
 
                 <button class="remove-watchlist" type="button">
-    <i data-lucide="trash-2"></i>
-    <span>Remove</span>
-</button>
+                    <i data-lucide="trash-2"></i>
+                    <span>Remove</span>
+                </button>
             </div>
         `;
 
     const removeButton = card.querySelector(".remove-watchlist");
+
+    // ==========================================
+    // REMOVE ANIME FROM WATCHLIST
+    // ==========================================
 
     removeButton.addEventListener("click", () => {
       removedIndex = watchlist.findIndex((anime) => anime.id === item.id);
@@ -461,14 +549,20 @@ function renderWatchlist() {
         watchlistToast.classList.remove("active");
 
         removedAnime = null;
+
         removedIndex = -1;
       }, 5000);
     });
 
     watchlistContainer.appendChild(card);
+
     lucide.createIcons();
   });
 }
+
+// ==========================================
+// UNDO WATCHLIST REMOVAL
+// ==========================================
 
 undoButton.addEventListener("click", () => {
   if (!removedAnime) return;
@@ -484,19 +578,23 @@ undoButton.addEventListener("click", () => {
   clearTimeout(toastTimeout);
 
   removedAnime = null;
+
   removedIndex = -1;
 });
 
+// Initial Watchlist rendering
 renderWatchlist();
 
-/// ==========================================
-// PAGE NAVIGATION
+// ==========================================
+// 13. PAGE NAVIGATION
 // ==========================================
 
 const homeView = document.getElementById("home-view");
+
 const watchlistView = document.getElementById("watchlist");
 
 const homeLink = document.getElementById("home-link");
+
 const watchlistLink = document.getElementById("watchlist-link");
 
 function showView(view) {
@@ -505,7 +603,7 @@ function showView(view) {
     page.classList.remove("active");
   });
 
-  // Show the selected page
+  // Show selected page
   view.classList.add("active");
 
   // Scroll to the top
