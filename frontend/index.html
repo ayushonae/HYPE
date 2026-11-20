@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="style.css" />
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <title>HYPE</title>
+  </head>
+
+  <body>
+    <!-- NAVIGATION -->
+    <nav>
+      <h1>HYPE</h1>
+
+      <div class="nav-links">
+        <a href="#" id="home-link" aria-label="Home">
+          <i data-lucide="house"></i>
+        </a>
+
+        <a href="#">Discover</a>
+        <a href="#">Communities</a>
+        <a href="#watchlist" id="watchlist-link">Watchlist</a>
+        <a href="#">Messages</a>
+        <a href="#">Friends</a>
+      </div>
+
+      <div class="search-box">
+        <i data-lucide="search"></i>
+        <input type="text" placeholder="Search" />
+      </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main>
+      <!-- HOME VIEW -->
+      <div id="home-view" class="page-view">
+        <!-- FEATURED -->
+        <section class="featured">
+          <h2>Featured</h2>
+
+          <h3 id="featured-title">One Piece</h3>
+
+          <p id="featured-description">
+            The journey of Monkey D. Luffy and his crew as they search for the
+            legendary One Piece.
+          </p>
+
+          <button>Explore</button>
+        </section>
+
+        <!-- CONTINUE WATCHING -->
+        <section>
+          <h2>Continue Watching</h2>
+
+          <div class="content-grid" id="continue-watching"></div>
+        </section>
+
+        <!-- FOR YOU -->
+        <section>
+          <h2>For You</h2>
+
+          <div class="content-grid" id="for-you"></div>
+        </section>
+
+        <!-- TODAY'S PICK -->
+        <section>
+          <h2>Today's Pick</h2>
+        </section>
+
+        <!-- UPCOMING -->
+        <section>
+          <h2>Upcoming</h2>
+        </section>
+      </div>
+
+      <!-- WATCHLIST VIEW -->
+      <section class="watchlist-section page-view" id="watchlist">
+        <div class="section-heading">
+          <h2>Your Watchlist</h2>
+
+          <p>Your personal collection of anime.</p>
+        </div>
+
+        <div class="content-grid" id="watchlist-container">
+          <!-- Saved anime cards will appear here -->
+        </div>
+
+        <p class="empty-watchlist" id="empty-watchlist">
+          Your watchlist is empty. Explore something new!
+        </p>
+      </section>
+    </main>
+
+    <!-- UNDO NOTIFICATION -->
+
+    <div class="toast" id="watchlist-toast">
+      <span id="toast-message"> Removed from Watchlist </span>
+
+      <button id="undo-remove">Undo</button>
+    </div>
+
+    <!-- EXPLORE PANEL -->
+    <div class="explore-overlay" id="explore-overlay">
+      <div class="explore-panel">
+        <button class="close-explore" id="close-explore" aria-label="Close">
+          <i data-lucide="x"></i>
+        </button>
+
+        <div class="explore-layout">
+          <img
+            id="explore-image"
+            class="explore-image"
+            src=""
+            alt="Anime cover"
+          />
+
+          <div class="explore-content">
+            <span class="explore-label"> ANIME DETAILS </span>
+
+            <h2 id="explore-title">Vinland Saga</h2>
+
+            <p class="explore-description" id="explore-description">
+              A young warrior's journey through war, revenge, and the search for
+              a true purpose.
+            </p>
+
+            <div class="explore-meta">
+              <span id="explore-rating">⭐ 8.8</span>
+
+              <span id="explore-episodes">24 Episodes</span>
+
+              <div class="explore-genres" id="explore-genres"></div>
+            </div>
+
+            <div class="explore-actions">
+              <button class="primary-action">Add to Watchlist</button>
+
+              <button class="secondary-action">
+                <i data-lucide="message-circle"></i>
+                Discuss
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- JAVASCRIPT -->
+    <script src="script.js"></script>
+
+    <script>
+      lucide.createIcons();
+    </script>
+  </body>
+</html>
