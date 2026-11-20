@@ -272,14 +272,25 @@ fetch("https://graphql.anilist.co", {
 
     const featuredData = data.data.Media;
 
-    // Save the poster URL
     anime[0].image = featuredData.coverImage.large;
 
-    // Update selected anime if One Piece is currently selected
+    // Update the currently selected anime
     if (selectedAnime?.id === featuredData.id) {
       selectedAnime.image = featuredData.coverImage.large;
-
       exploreImage.src = featuredData.coverImage.large;
+    }
+
+    // Update the saved Watchlist entry
+    const watchlistAnime = watchlist.find(
+      (item) => item.id === featuredData.id,
+    );
+
+    if (watchlistAnime) {
+      watchlistAnime.image = featuredData.coverImage.large;
+
+      localStorage.setItem("hype-watchlist", JSON.stringify(watchlist));
+
+      renderWatchlist();
     }
   })
 
@@ -367,26 +378,19 @@ closeExplore.addEventListener("click", () => {
 // ==========================================
 
 addToWatchlistButton.addEventListener("click", () => {
+  if (!selectedAnime) return;
 
-    if (!selectedAnime) return;
+  const alreadyAdded = watchlist.some((item) => item.id === selectedAnime.id);
 
-    const alreadyAdded = watchlist.some(
-        (item) => item.id === selectedAnime.id
-    );
+  if (alreadyAdded) return;
 
-    if (alreadyAdded) return;
+  watchlist.push(selectedAnime);
 
-    watchlist.push(selectedAnime);
+  localStorage.setItem("hype-watchlist", JSON.stringify(watchlist));
 
-    localStorage.setItem(
-        "hype-watchlist",
-        JSON.stringify(watchlist)
-    );
+  addToWatchlistButton.textContent = "Added to Watchlist";
 
-    addToWatchlistButton.textContent = "Added to Watchlist";
-
-    addToWatchlistButton.disabled = true;
-
+  addToWatchlistButton.disabled = true;
 });
 
 // ==========================================
