@@ -27,6 +27,7 @@ const undoButton = document.getElementById("undo-remove");
 
 const featuredTitle = document.getElementById("featured-title");
 const featuredDescription = document.getElementById("featured-description");
+const featuredImage = document.getElementById("featured-image");
 
 let removedAnime = null;
 let removedIndex = -1;
@@ -46,8 +47,8 @@ let watchlist = JSON.parse(localStorage.getItem("hype-watchlist")) || [];
 
 const query = `
     query {
-        Page(perPage: 3) {
-            media(type: ANIME) {
+        Page(perPage: 12) {
+            media(type: ANIME, sort: POPULARITY_DESC) {
                 id
                 title {
                     romaji
@@ -270,6 +271,7 @@ fetch("https://graphql.anilist.co", {
                         coverImage {
                             large
                         }
+                        bannerImage
                         description
                         episodes
                         averageScore
@@ -315,10 +317,12 @@ fetch("https://graphql.anilist.co", {
 
     anime[0] = {
       id: featuredData.id,
-
       title: featuredData.title.romaji,
 
+      // Portrait image for Explore and Watchlist
       image: featuredData.coverImage.large,
+      // Landscape image for Featured homepage
+      bannerImage: featuredData.bannerImage || featuredData.coverImage.large,
 
       episode: 0,
 
@@ -344,6 +348,31 @@ fetch("https://graphql.anilist.co", {
     featuredTitle.textContent = anime[0].title;
 
     featuredDescription.textContent = anime[0].description;
+
+    featuredImage.src = anime[0].bannerImage;
+    featuredImage.alt = anime[0].title;
+
+    // Update rating
+    document.getElementById("featured-rating").textContent = anime[0].rating
+      ? `⭐ ${(anime[0].rating / 10).toFixed(1)}`
+      : "⭐ N/A";
+
+    // Update episodes
+    document.getElementById("featured-episodes").textContent =
+      anime[0].episodes;
+
+    // Update genres
+    const featuredGenres = document.getElementById("featured-genres");
+
+    featuredGenres.innerHTML = "";
+
+    anime[0].genres.forEach((genre) => {
+      const genreTag = document.createElement("span");
+
+      genreTag.textContent = genre;
+
+      featuredGenres.appendChild(genreTag);
+    });
 
     // ==========================================
     // SYNCHRONIZE SELECTED ANIME

@@ -45,17 +45,45 @@
       <!-- HOME VIEW -->
       <div id="home-view" class="page-view">
         <!-- FEATURED -->
+
         <section class="featured">
-          <h2>Featured</h2>
+          <!-- Dynamic anime background -->
+          <img
+            id="featured-image"
+            class="featured-image"
+            src=""
+            alt="Featured anime"
+          />
 
-          <h3 id="featured-title">One Piece</h3>
+          <!-- Dark overlay -->
+          <div class="featured-overlay"></div>
 
-          <p id="featured-description">
-            The journey of Monkey D. Luffy and his crew as they search for the
-            legendary One Piece.
-          </p>
+          <!-- Featured anime information -->
+          <div class="featured-content">
+            <span class="featured-label">HYPE ORIGINAL PICK</span>
 
-          <button>Explore</button>
+            <h2>Featured</h2>
+
+            <h3 id="featured-title">One Piece</h3>
+
+            <p id="featured-description">
+              The journey of Monkey D. Luffy and his crew as they search for the
+              legendary One Piece.
+            </p>
+
+            <div class="featured-meta">
+              <span id="featured-rating">⭐ 9.1</span>
+              <span id="featured-episodes">1120+ Episodes</span>
+              <div id="featured-genres" class="featured-genres"></div>
+            </div>
+
+            <div class="featured-actions">
+              <button class="featured-explore">
+                <i data-lucide="compass"></i>
+                Explore
+              </button>
+            </div>
+          </div>
         </section>
 
         <!-- CONTINUE WATCHING -->

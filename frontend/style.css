@@ -1,3 +1,7 @@
+/* ==========================================
+   1. GLOBAL VARIABLES
+========================================== */
+
 :root {
   --bg-primary: #0b0f10;
   --bg-secondary: #111819;
@@ -15,6 +19,10 @@
   --radius: 14px;
 }
 
+/* ==========================================
+   2. GLOBAL RESET
+========================================== */
+
 * {
   margin: 0;
   padding: 0;
@@ -27,6 +35,10 @@ body {
   font-family: "Inter", sans-serif;
   min-height: 100vh;
 }
+
+/* ==========================================
+   3. NAVIGATION BAR
+========================================== */
 
 nav {
   height: 72px;
@@ -115,6 +127,10 @@ nav h1 {
   color: var(--text-secondary);
 }
 
+/* ==========================================
+   4. MAIN LAYOUT
+========================================== */
+
 main {
   padding: 32px 40px 60px;
   max-width: 1500px;
@@ -132,80 +148,305 @@ main h2 {
   letter-spacing: -0.3px;
 }
 
+/* ==========================================
+   5. CINEMATIC FEATURED HERO
+========================================== */
+
 .featured {
-  min-height: 360px;
+  position: relative;
+
+  width: 100%;
+  min-height: 560px;
+
+  display: flex;
+  align-items: center;
+
+  padding: 60px 64px;
+
+  border-radius: 18px;
+  overflow: hidden;
+
+  background: #101719;
+  border: 1px solid var(--border);
+}
+
+/* Full background anime artwork */
+
+.featured-image {
+  position: absolute;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+  object-position: center center;
+
+  z-index: 0;
+}
+
+/* Cinematic dark gradient */
+
+.featured-overlay {
+  position: absolute;
+  inset: 0;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(5, 9, 10, 0.98) 0%,
+      rgba(5, 9, 10, 0.88) 35%,
+      rgba(5, 9, 10, 0.45) 65%,
+      rgba(5, 9, 10, 0.12) 100%
+    ),
+    linear-gradient(0deg, rgba(5, 9, 10, 0.75), transparent 45%);
+
+  z-index: 1;
+}
+
+/* Featured information */
+
+.featured-content {
+  position: relative;
+
+  z-index: 2;
+
+  width: 55%;
+  max-width: 650px;
 
   display: flex;
   flex-direction: column;
-  justify-content: center;
-
-  padding: 48px;
-
-  border-radius: 18px;
-
-  background:
-    linear-gradient(90deg, rgba(0, 122, 204, 0.18), rgba(0, 0, 0, 0.05)),
-    var(--bg-secondary);
-
-  border: 1px solid var(--border);
-
-  overflow: hidden;
+  align-items: flex-start;
 }
+
+/* Small featured label */
+
+.featured-label {
+  color: var(--accent-hover);
+
+  font-size: 12px;
+  font-weight: 700;
+
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+
+  margin-bottom: 18px;
+}
+
+/* Featured heading */
 
 .featured h2 {
-  color: var(--accent);
-  font-size: 13px;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  margin-bottom: 14px;
-}
+  color: var(--text-secondary);
 
-.featured h3 {
-  font-size: 42px;
+  font-size: 13px;
+  font-weight: 600;
+
+  letter-spacing: 2px;
+  text-transform: uppercase;
+
   margin-bottom: 12px;
 }
 
-.featured p {
-  max-width: 560px;
-  color: var(--text-secondary);
-  line-height: 1.6;
-  margin-bottom: 24px;
+/* Anime title */
+
+.featured h3 {
+  color: #ffffff;
+
+  font-size: clamp(34px, 4vw, 54px);
+  font-weight: 800;
+
+  line-height: 1.12;
+  letter-spacing: -1.5px;
+
+  margin-bottom: 20px;
 }
 
-.featured button {
-  width: fit-content;
+/* Anime description */
 
-  padding: 11px 22px;
+.featured p {
+  max-width: 560px;
+
+  color: rgba(235, 242, 245, 0.82);
+
+  font-size: 15px;
+  line-height: 1.8;
+
+  margin-bottom: 22px;
+}
+
+/* Rating, episodes and genres */
+
+.featured-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+
+  gap: 12px;
+
+  margin-bottom: 30px;
+}
+
+.featured-meta > span {
+  color: #ffffff;
+
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.featured-genres {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.featured-genres span {
+  padding: 6px 11px;
+
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 20px;
+
+  background: rgba(255, 255, 255, 0.08);
+
+  color: #e5eeee;
+
+  font-size: 11px;
+  font-weight: 500;
+
+  backdrop-filter: blur(8px);
+}
+
+/* Featured actions */
+
+.featured-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.featured-explore {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+
+  padding: 13px 24px;
 
   border: none;
-  border-radius: 9px;
+  border-radius: 8px;
 
   background: var(--accent);
   color: white;
 
+  font-family: inherit;
   font-size: 14px;
   font-weight: 600;
 
   cursor: pointer;
 
-  transition:
-    background 0.2s ease,
-    transform 0.2s ease;
+  transition: 0.25s ease;
 }
 
-.featured button:hover {
+.featured-explore:hover {
   background: var(--accent-hover);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+
+  box-shadow: 0 8px 24px rgba(0, 122, 204, 0.3);
 }
+
+.featured-explore svg {
+  width: 17px;
+  height: 17px;
+}
+
+/* ==========================================
+   FEATURED RESPONSIVE DESIGN
+========================================== */
+
+@media (max-width: 900px) {
+  .featured {
+    min-height: 500px;
+    padding: 44px;
+  }
+
+  .featured-content {
+    width: 70%;
+  }
+
+  .featured h3 {
+    font-size: 40px;
+  }
+}
+
+@media (max-width: 650px) {
+  .featured {
+    min-height: 540px;
+
+    align-items: flex-end;
+
+    padding: 28px 22px;
+  }
+
+  .featured-image {
+    object-position: center top;
+  }
+
+  .featured-overlay {
+    background: linear-gradient(
+      0deg,
+      rgba(5, 9, 10, 0.98) 0%,
+      rgba(5, 9, 10, 0.85) 45%,
+      rgba(5, 9, 10, 0.15) 100%
+    );
+  }
+
+  .featured-content {
+    width: 100%;
+  }
+
+  .featured h3 {
+    font-size: 34px;
+  }
+
+  .featured p {
+    font-size: 13px;
+    line-height: 1.7;
+  }
+
+  .featured-meta {
+    gap: 10px;
+  }
+}
+
+@media (max-width: 420px) {
+  .featured {
+    min-height: 500px;
+    padding: 22px 18px;
+  }
+
+  .featured h3 {
+    font-size: 29px;
+  }
+
+  .featured-label {
+    font-size: 10px;
+  }
+}
+
+/* ==========================================
+   6. ANIME CONTENT GRID
+========================================== */
 
 .content-grid {
   display: grid;
+
   grid-template-columns: repeat(3, minmax(0, 230px));
+
   gap: 20px;
 }
 
 .content-card {
   background: var(--bg-card);
+
   border: 1px solid var(--border);
   border-radius: var(--radius);
 
@@ -222,27 +463,25 @@ main h2 {
 }
 
 .poster {
-  height: 260px;
+  width: 100%;
+  aspect-ratio: 2 / 3;
 
-  display: flex;
-  align-items: flex-end;
+  display: block;
 
-  padding: 14px;
+  padding: 0;
 
-  background:
-    linear-gradient(180deg, transparent 50%, rgba(0, 0, 0, 0.8)),
-    var(--bg-secondary);
+  overflow: hidden;
+
+  background: var(--bg-secondary);
 }
 
-.poster span {
-  padding: 5px 9px;
+.poster img {
+  display: block;
 
-  border-radius: 6px;
+  width: 100%;
+  height: 100%;
 
-  background: var(--accent-soft);
-  color: var(--text-primary);
-
-  font-size: 12px;
+  object-fit: cover;
 }
 
 .card-info {
@@ -252,6 +491,7 @@ main h2 {
 .card-info h3 {
   font-size: 14px;
   font-weight: 500;
+
   margin-bottom: 6px;
   letter-spacing: -0.2px;
 }
@@ -260,6 +500,20 @@ main h2 {
   color: var(--text-secondary);
   font-size: 13px;
 }
+
+.anime-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  margin-top: 8px;
+
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+/* Progress bar */
 
 .progress {
   width: 100%;
@@ -280,6 +534,10 @@ main h2 {
   background: var(--accent);
   border-radius: inherit;
 }
+
+/* ==========================================
+   7. EXPLORE OVERLAY
+========================================== */
 
 .explore-overlay {
   position: fixed;
@@ -308,7 +566,7 @@ main h2 {
 
   padding: 48px;
 
-  background: rgba(17, 24, 25, 0.92);
+  background: rgba(17, 24, 25, 0.95);
 
   border: 1px solid var(--border);
   border-radius: 20px;
@@ -329,6 +587,8 @@ main h2 {
     transform: translateY(0) scale(1);
   }
 }
+
+/* Close button */
 
 .close-explore {
   position: absolute;
@@ -363,6 +623,31 @@ main h2 {
   height: 18px;
 }
 
+/* Explore content layout */
+
+.explore-layout {
+  display: grid;
+
+  grid-template-columns: 190px minmax(0, 1fr);
+
+  gap: 28px;
+
+  align-items: start;
+}
+
+.explore-image {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+
+  object-fit: cover;
+
+  border-radius: 12px;
+}
+
+.explore-content {
+  min-width: 0;
+}
+
 .explore-label {
   color: var(--accent);
 
@@ -375,7 +660,8 @@ main h2 {
 .explore-content h2 {
   margin-top: 12px;
 
-  font-size: 38px;
+  font-size: 30px;
+  font-weight: 600;
 }
 
 .explore-description {
@@ -387,6 +673,8 @@ main h2 {
 
   line-height: 1.7;
 }
+
+/* Explore metadata */
 
 .explore-meta {
   display: flex;
@@ -408,6 +696,24 @@ main h2 {
 
   font-size: 13px;
 }
+
+.explore-genres {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.explore-genres span {
+  padding: 7px 12px;
+
+  background: var(--accent-soft);
+
+  border-radius: 7px;
+
+  font-size: 12px;
+}
+
+/* Explore actions */
 
 .explore-actions {
   display: flex;
@@ -435,17 +741,20 @@ main h2 {
   color: white;
 }
 
-.secondary-action {
-  border: 1px solid var(--border);
-
-  background: transparent;
-  color: var(--text-primary);
+.primary-action:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
 }
 
 .secondary-action {
   display: flex;
   align-items: center;
   gap: 8px;
+
+  border: 1px solid var(--border);
+
+  background: transparent;
+  color: var(--text-primary);
 }
 
 .secondary-action svg {
@@ -453,86 +762,9 @@ main h2 {
   height: 16px;
 }
 
-.poster {
-  width: 100%;
-  aspect-ratio: 2 / 3;
-
-  display: block;
-
-  padding: 0;
-  overflow: hidden;
-}
-
-.poster img {
-  display: block;
-
-  width: 100%;
-  height: 100%;
-
-  object-fit: cover;
-}
-
-@media (max-width: 750px) {
-  .content-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-.anime-meta {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-
-  margin-top: 8px;
-
-  color: var(--text-secondary);
-  font-size: 12px;
-  font-weight: 400;
-}
-
-.explore-layout {
-  display: grid;
-  grid-template-columns: 190px minmax(0, 1fr);
-  gap: 28px;
-  align-items: start;
-}
-
-.explore-image {
-  width: 100%;
-  aspect-ratio: 2 / 3;
-  object-fit: cover;
-  border-radius: 12px;
-}
-
-.explore-content {
-  min-width: 0;
-}
-
-.explore-content h2 {
-  margin-top: 12px;
-  font-size: 30px;
-  font-weight: 600;
-}
-
-.explore-genres {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.explore-genres span {
-  padding: 7px 12px;
-  background: var(--accent-soft);
-  border-radius: 7px;
-  font-size: 12px;
-}
-
-.primary-action:disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
-}
-
-/* WATCHLIST */
+/* ==========================================
+   8. WATCHLIST
+========================================== */
 
 .watchlist-section {
   display: none;
@@ -549,7 +781,9 @@ main h2 {
 
 .empty-watchlist {
   display: none;
+
   color: var(--text-secondary);
+
   margin-top: 30px;
 }
 
@@ -561,17 +795,9 @@ main h2 {
   scroll-margin-top: 90px;
 }
 
-/* PAGE NAVIGATION */
-
-.page-view {
-  display: none;
-}
-
-.page-view.active {
-  display: block;
-}
-
-/* REMOVE FROM WATCHLIST */
+/* ==========================================
+   9. REMOVE FROM WATCHLIST
+========================================== */
 
 .remove-watchlist {
   display: inline-flex;
@@ -606,7 +832,9 @@ main h2 {
   height: 14px;
 }
 
-/* WATCHLIST UNDO TOAST */
+/* ==========================================
+   10. WATCHLIST UNDO TOAST
+========================================== */
 
 .toast {
   position: fixed;
@@ -620,6 +848,7 @@ main h2 {
   padding: 14px 20px;
 
   background: var(--bg-secondary);
+
   border: 1px solid var(--border);
   border-radius: 12px;
 
@@ -629,6 +858,7 @@ main h2 {
   visibility: hidden;
 
   transform: translate(-50%, 20px);
+
   transition: 0.25s ease;
 
   z-index: 2000;
@@ -637,6 +867,7 @@ main h2 {
 .toast.active {
   opacity: 1;
   visibility: visible;
+
   transform: translate(-50%, 0);
 }
 
@@ -652,8 +883,171 @@ main h2 {
   cursor: pointer;
 }
 
+/* ==========================================
+   11. LOADING STATUS
+========================================== */
+
 .section-status {
   color: var(--text-secondary);
+
   font-size: 14px;
+
   margin-top: 16px;
+}
+
+/* ==========================================
+   12. PAGE NAVIGATION
+========================================== */
+
+.page-view {
+  display: none;
+}
+
+.page-view.active {
+  display: block;
+}
+
+/* ==========================================
+   13. RESPONSIVE DESIGN
+========================================== */
+
+/* Tablets */
+
+@media (max-width: 900px) {
+  main {
+    padding: 28px 24px 50px;
+  }
+
+  .featured {
+    gap: 32px;
+    padding: 36px;
+  }
+
+  .featured-image {
+    width: 220px;
+    height: 320px;
+  }
+
+  .featured h3 {
+    font-size: 34px;
+  }
+
+  .content-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* Mobile */
+
+@media (max-width: 650px) {
+  nav {
+    height: auto;
+    min-height: 64px;
+
+    padding: 16px 20px;
+
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .nav-links {
+    margin-left: auto;
+    gap: 16px;
+  }
+
+  .search-box {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  main {
+    padding: 24px 16px 40px;
+  }
+
+  .featured {
+    flex-direction: column;
+    align-items: center;
+
+    text-align: center;
+
+    gap: 24px;
+
+    padding: 28px 22px;
+  }
+
+  .featured-image {
+    width: 190px;
+    height: 280px;
+  }
+
+  .featured-content {
+    align-items: center;
+  }
+
+  .featured h3 {
+    font-size: 30px;
+  }
+
+  .featured p {
+    font-size: 13px;
+  }
+
+  .content-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .explore-panel {
+    max-height: 90vh;
+    overflow-y: auto;
+
+    padding: 36px 22px;
+  }
+
+  .explore-layout {
+    grid-template-columns: 110px minmax(0, 1fr);
+    gap: 18px;
+  }
+
+  .explore-content h2 {
+    font-size: 23px;
+  }
+
+  .explore-description {
+    font-size: 13px;
+  }
+}
+
+/* Small mobile screens */
+
+@media (max-width: 420px) {
+  .nav-links {
+    gap: 12px;
+  }
+
+  .nav-links a {
+    font-size: 12px;
+  }
+
+  .featured-image {
+    width: 165px;
+    height: 245px;
+  }
+
+  .featured h3 {
+    font-size: 26px;
+  }
+
+  .content-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .explore-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .explore-image {
+    width: 130px;
+    margin: 0 auto;
+  }
 }
