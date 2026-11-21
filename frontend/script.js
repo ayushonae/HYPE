@@ -189,6 +189,7 @@ fetch("https://graphql.anilist.co", {
       // Add completed card to For You section
       container.appendChild(card);
     });
+    updateCarouselButtons();
   })
 
   .catch((error) => {
@@ -696,3 +697,5 @@ forYouCarousel.addEventListener("scroll", updateCarouselButtons);
 
 // Initial button state
 updateCarouselButtons();
+// Recalculate arrow states when the window is resized
+window.addEventListener("resize", updateCarouselButtons);
