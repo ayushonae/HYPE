@@ -268,10 +268,17 @@ main h2 {
 
   color: rgba(235, 242, 245, 0.82);
 
-  font-size: 15px;
-  line-height: 1.8;
+  font-size: 14px;
+  line-height: 1.7;
 
   margin-bottom: 22px;
+
+  /* Limit description length */
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+
+  overflow: hidden;
 }
 
 /* Rating, episodes and genres */
@@ -1049,5 +1056,160 @@ main h2 {
   .explore-image {
     width: 130px;
     margin: 0 auto;
+  }
+}
+
+/* ==========================================
+   14. FOR YOU ANIME CAROUSEL
+========================================== */
+
+.for-you-section {
+  position: relative;
+}
+
+/* Carousel heading */
+
+.carousel-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 22px;
+}
+
+.carousel-heading h2 {
+  margin-bottom: 5px;
+}
+
+.carousel-heading p {
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+/* Navigation arrows */
+
+.carousel-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.carousel-arrow {
+  width: 38px;
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: var(--bg-card);
+  color: var(--text-primary);
+
+  border: 1px solid var(--border);
+  border-radius: 50%;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.carousel-arrow:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+
+  transform: translateY(-2px);
+}
+
+.carousel-arrow:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.carousel-arrow svg {
+  width: 19px;
+  height: 19px;
+}
+
+/* Horizontal scrolling track */
+
+.carousel-track {
+  display: flex;
+  gap: 20px;
+
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+
+  padding: 4px 2px 16px;
+
+  scrollbar-width: none;
+}
+
+.carousel-track::-webkit-scrollbar {
+  display: none;
+}
+
+/* Individual anime cards */
+
+.carousel-track .content-card {
+  flex: 0 0 210px;
+
+  min-width: 0;
+
+  scroll-snap-align: start;
+}
+
+/* Consistent poster dimensions */
+
+.carousel-track .poster {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+
+  height: auto;
+
+  overflow: hidden;
+}
+
+.carousel-track .poster img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  transition: transform 0.35s ease;
+}
+
+.carousel-track .content-card:hover .poster img {
+  transform: scale(1.05);
+}
+
+/* Card title */
+
+.carousel-track .card-info h3 {
+  font-size: 14px;
+  font-weight: 600;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Mobile adjustments */
+
+@media (max-width: 650px) {
+  .carousel-track {
+    gap: 14px;
+  }
+
+  .carousel-track .content-card {
+    flex-basis: 165px;
+  }
+
+  .carousel-arrow {
+    width: 34px;
+    height: 34px;
   }
 }

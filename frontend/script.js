@@ -409,13 +409,8 @@ fetch("https://graphql.anilist.co", {
 // 8. FEATURED SECTION
 // ==========================================
 
-// Display temporary Featured data initially
-
-const featured = anime[0];
-
-featuredTitle.textContent = featured.title;
-
-featuredDescription.textContent = featured.description;
+// Wait for AniList to provide the featured anime.
+// Initial loading text is already present in HTML.
 
 // ==========================================
 // 9. FEATURED EXPLORE BUTTON
@@ -660,3 +655,44 @@ watchlistLink.addEventListener("click", (event) => {
 
 // Show Home initially
 showView(homeView);
+
+// ==========================================
+// 14. FOR YOU CAROUSEL NAVIGATION
+// ==========================================
+
+const forYouCarousel = document.getElementById("for-you");
+
+const previousButton = document.getElementById("for-you-prev");
+
+const nextButton = document.getElementById("for-you-next");
+
+// Move carousel left
+previousButton.addEventListener("click", () => {
+  forYouCarousel.scrollBy({
+    left: -forYouCarousel.clientWidth * 0.8,
+    behavior: "smooth",
+  });
+});
+
+// Move carousel right
+nextButton.addEventListener("click", () => {
+  forYouCarousel.scrollBy({
+    left: forYouCarousel.clientWidth * 0.8,
+    behavior: "smooth",
+  });
+});
+
+// Update arrow states
+function updateCarouselButtons() {
+  previousButton.disabled = forYouCarousel.scrollLeft <= 0;
+
+  nextButton.disabled =
+    forYouCarousel.scrollLeft + forYouCarousel.clientWidth >=
+    forYouCarousel.scrollWidth - 1;
+}
+
+// Listen for scrolling
+forYouCarousel.addEventListener("scroll", updateCarouselButtons);
+
+// Initial button state
+updateCarouselButtons();

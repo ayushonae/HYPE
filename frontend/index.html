@@ -64,12 +64,9 @@
 
             <h2>Featured</h2>
 
-            <h3 id="featured-title">One Piece</h3>
+            <h3 id="featured-title">Discovering...</h3>
 
-            <p id="featured-description">
-              The journey of Monkey D. Luffy and his crew as they search for the
-              legendary One Piece.
-            </p>
+            <p id="featured-description">Finding something worth watching.</p>
 
             <div class="featured-meta">
               <span id="featured-rating">⭐ 9.1</span>
@@ -94,15 +91,40 @@
         </section>
 
         <!-- FOR YOU -->
-        <section>
-          <h2>For You</h2>
+
+        <section class="for-you-section">
+          <div class="carousel-heading">
+            <div>
+              <h2>For You</h2>
+              <p>Discover your next obsession.</p>
+            </div>
+
+            <div class="carousel-controls">
+              <button
+                id="for-you-prev"
+                class="carousel-arrow"
+                aria-label="Previous anime"
+              >
+                <i data-lucide="chevron-left"></i>
+              </button>
+
+              <button
+                id="for-you-next"
+                class="carousel-arrow"
+                aria-label="Next anime"
+              >
+                <i data-lucide="chevron-right"></i>
+              </button>
+            </div>
+          </div>
 
           <p id="for-you-status" class="section-status">
             Discovering something good...
           </p>
 
-          <div class="content-grid" id="for-you"></div>
+          <div class="carousel-track" id="for-you"></div>
         </section>
+
         <!-- TODAY'S PICK -->
         <section>
           <h2>Today's Pick</h2>
