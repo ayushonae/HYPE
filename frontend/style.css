@@ -273,7 +273,6 @@ main h2 {
 
   margin-bottom: 22px;
 
-  /* Limit description length */
   display: -webkit-box;
   -webkit-line-clamp: 4;
   -webkit-box-orient: vertical;
@@ -365,9 +364,7 @@ main h2 {
   height: 17px;
 }
 
-/* ==========================================
-   FEATURED RESPONSIVE DESIGN
-========================================== */
+/* Featured responsive design */
 
 @media (max-width: 900px) {
   .featured {
@@ -768,7 +765,6 @@ main h2 {
   width: 16px;
   height: 16px;
 }
-
 /* ==========================================
    8. WATCHLIST
 ========================================== */
@@ -1211,5 +1207,152 @@ main h2 {
   .carousel-arrow {
     width: 34px;
     height: 34px;
+  }
+}
+
+/* ==========================================
+   15. PREMIUM ANIME CARD HOVER EFFECTS
+========================================== */
+
+/* Smooth card interaction */
+
+.carousel-track .content-card {
+  cursor: pointer;
+
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease,
+    border-color 0.3s ease;
+
+  border: 1px solid transparent;
+}
+
+/* Lift the card slightly */
+
+.carousel-track .content-card:hover {
+  transform: translateY(-7px);
+
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+
+  border-color: var(--accent);
+}
+
+/* Smooth poster zoom */
+
+.carousel-track .poster {
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+.carousel-track .poster img {
+  transition: transform 0.3s ease;
+}
+
+.carousel-track .content-card:hover .poster img {
+  transform: scale(1.025);
+}
+
+/* Smooth title color transition */
+
+.carousel-track .card-info h3 {
+  transition: color 0.25s ease;
+}
+
+.carousel-track .content-card:hover .card-info h3 {
+  color: var(--accent);
+}
+
+/* Respect reduced-motion preferences */
+
+@media (prefers-reduced-motion: reduce) {
+  .carousel-track .content-card,
+  .carousel-track .poster img,
+  .carousel-track .card-info h3 {
+    transition: none;
+  }
+
+  .carousel-track .content-card:hover,
+  .carousel-track .content-card:hover .poster img {
+    transform: none;
+  }
+}
+
+/* ==========================================
+   16. EXPLORE DESCRIPTION
+========================================== */
+
+/* Keep descriptions compact until expanded */
+
+.explore-description {
+  max-height: calc(1.7em * 5);
+  overflow: hidden;
+  line-height: 1.7;
+
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 5;
+  line-clamp: 5;
+}
+
+/* Expanded descriptions scroll independently */
+
+.explore-description.expanded {
+  display: block;
+  max-height: 180px;
+  overflow-y: auto;
+  padding-right: 8px;
+
+  -webkit-line-clamp: unset;
+  line-clamp: unset;
+}
+
+/* Subtle scrollbar styling */
+
+.explore-description.expanded::-webkit-scrollbar {
+  width: 5px;
+}
+
+.explore-description.expanded::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 10px;
+}
+
+.explore-description.expanded::-webkit-scrollbar-thumb {
+  background: rgba(0, 122, 204, 0.65);
+  border-radius: 10px;
+}
+
+/* Read more / Show less control */
+
+.explore-read-more {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 0;
+
+  background: transparent;
+  border: none;
+
+  color: var(--accent-hover);
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.explore-read-more:hover {
+  color: var(--text-primary);
+}
+
+.explore-read-more[hidden] {
+  display: none;
+}
+
+/* Mobile expanded description */
+
+@media (max-width: 650px) {
+  .explore-description.expanded {
+    max-height: 150px;
   }
 }

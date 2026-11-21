@@ -11,6 +11,7 @@ const exploreOverlay = document.getElementById("explore-overlay");
 const exploreImage = document.getElementById("explore-image");
 const exploreTitle = document.getElementById("explore-title");
 const exploreDescription = document.getElementById("explore-description");
+const exploreReadMore = document.getElementById("explore-read-more");
 const exploreRating = document.getElementById("explore-rating");
 const exploreEpisodes = document.getElementById("explore-episodes");
 const exploreGenres = document.getElementById("explore-genres");
@@ -35,6 +36,28 @@ let toastTimeout;
 
 let selectedAnime = null;
 
+// Reset the Explore description whenever a different anime is opened.
+function setExploreDescription(description) {
+  // Convert AniList's HTML-formatted synopsis into plain text.
+  const temporaryElement = document.createElement("div");
+  temporaryElement.innerHTML = description || "No description available.";
+
+  exploreDescription.textContent =
+    temporaryElement.textContent || "No description available.";
+
+  exploreDescription.classList.remove("expanded");
+  exploreReadMore.textContent = "Read more ↓";
+  exploreReadMore.setAttribute("aria-expanded", "false");
+
+  // Show the control only when the description actually overflows.
+  requestAnimationFrame(() => {
+    const isOverflowing =
+      exploreDescription.scrollHeight > exploreDescription.clientHeight + 1;
+
+    exploreReadMore.hidden = !isOverflowing;
+  });
+}
+
 // ==========================================
 // WATCHLIST STORAGE
 // ==========================================
@@ -45,9 +68,12 @@ let watchlist = JSON.parse(localStorage.getItem("hype-watchlist")) || [];
 // 2. ANILIST GRAPHQL QUERY
 // ==========================================
 
+// Randomly select a page between 1 and 50.
+const randomPage = Math.floor(Math.random() * 50) + 1;
+
 const query = `
     query {
-        Page(perPage: 12) {
+        Page(page: ${randomPage}, perPage: 12) {
             media(type: ANIME, sort: POPULARITY_DESC) {
                 id
                 title {
@@ -89,14 +115,14 @@ fetch("https://graphql.anilist.co", {
   })
 
   .then((data) => {
-    // Check whether AniList returned GraphQL errors
+    // Check whether AniList returned GraphQL errors.
     if (data.errors) {
       throw new Error(data.errors[0].message);
     }
 
     const animeList = data.data.Page.media;
 
-    // Hide loading message after successful response
+    // Hide loading message after successful response.
     forYouStatus.style.display = "none";
 
     // ==========================================
@@ -154,8 +180,7 @@ fetch("https://graphql.anilist.co", {
 
         exploreTitle.textContent = item.title.romaji;
 
-        exploreDescription.innerHTML =
-          item.description || "No description available.";
+        setExploreDescription(item.description);
 
         exploreRating.textContent = `⭐ ${
           item.averageScore ? (item.averageScore / 10).toFixed(1) : "N/A"
@@ -178,17 +203,18 @@ fetch("https://graphql.anilist.co", {
         );
 
         addToWatchlistButton.textContent = alreadyAdded
-          ? "Added to Watchlist"
+          ? "Remove from Watchlist"
           : "Add to Watchlist";
 
-        addToWatchlistButton.disabled = alreadyAdded;
+        addToWatchlistButton.disabled = false;
 
         exploreOverlay.classList.add("active");
       });
 
-      // Add completed card to For You section
+      // Add completed card to For You section.
       container.appendChild(card);
     });
+
     updateCarouselButtons();
   })
 
@@ -248,7 +274,6 @@ const anime = [
     genres: ["Action", "Drama"],
   },
 ];
-
 // ==========================================
 // 7. FETCH DYNAMIC FEATURED ANIME
 // ==========================================
@@ -292,12 +317,12 @@ fetch("https://graphql.anilist.co", {
   })
 
   .then((data) => {
-    // Check for GraphQL errors
+    // Check for GraphQL errors.
     if (data.errors) {
       throw new Error(data.errors[0].message);
     }
 
-    // Get the list of popular anime
+    // Get the list of popular anime.
     const featuredAnimeList = data.data.Page.media;
 
     if (featuredAnimeList.length === 0) {
@@ -320,9 +345,10 @@ fetch("https://graphql.anilist.co", {
       id: featuredData.id,
       title: featuredData.title.romaji,
 
-      // Portrait image for Explore and Watchlist
+      // Portrait image for Explore and Watchlist.
       image: featuredData.coverImage.large,
-      // Landscape image for Featured homepage
+
+      // Landscape image for Featured homepage.
       bannerImage: featuredData.bannerImage || featuredData.coverImage.large,
 
       episode: 0,
@@ -353,16 +379,16 @@ fetch("https://graphql.anilist.co", {
     featuredImage.src = anime[0].bannerImage;
     featuredImage.alt = anime[0].title;
 
-    // Update rating
+    // Update rating.
     document.getElementById("featured-rating").textContent = anime[0].rating
       ? `⭐ ${(anime[0].rating / 10).toFixed(1)}`
       : "⭐ N/A";
 
-    // Update episodes
+    // Update episodes.
     document.getElementById("featured-episodes").textContent =
       anime[0].episodes;
 
-    // Update genres
+    // Update genres.
     const featuredGenres = document.getElementById("featured-genres");
 
     featuredGenres.innerHTML = "";
@@ -420,7 +446,7 @@ fetch("https://graphql.anilist.co", {
 exploreButton.addEventListener("click", () => {
   const featured = anime[0];
 
-  // Store currently selected anime
+  // Store currently selected anime.
   selectedAnime = {
     id: featured.id,
     title: featured.title,
@@ -430,10 +456,10 @@ exploreButton.addEventListener("click", () => {
     genres: featured.genres,
   };
 
-  // Update Explore panel
+  // Update Explore panel.
   exploreTitle.textContent = featured.title;
 
-  exploreDescription.textContent = featured.description;
+  setExploreDescription(featured.description);
 
   exploreImage.src = featured.image || "";
 
@@ -445,7 +471,7 @@ exploreButton.addEventListener("click", () => {
 
   exploreEpisodes.textContent = featured.episodes;
 
-  // Display genres
+  // Display genres.
   exploreGenres.innerHTML = "";
 
   featured.genres.forEach((genre) => {
@@ -456,16 +482,16 @@ exploreButton.addEventListener("click", () => {
     exploreGenres.appendChild(genreTag);
   });
 
-  // Check Watchlist status
+  // Check Watchlist status.
   const alreadyAdded = watchlist.some((item) => item.id === selectedAnime.id);
 
   addToWatchlistButton.textContent = alreadyAdded
-    ? "Added to Watchlist"
+    ? "Remove from Watchlist"
     : "Add to Watchlist";
 
-  addToWatchlistButton.disabled = alreadyAdded;
+  addToWatchlistButton.disabled = false;
 
-  // Open Explore panel
+  // Open Explore panel.
   exploreOverlay.classList.add("active");
 });
 
@@ -477,24 +503,44 @@ closeExplore.addEventListener("click", () => {
   exploreOverlay.classList.remove("active");
 });
 
+// Expand or collapse the anime description.
+exploreReadMore.addEventListener("click", () => {
+  const isExpanded = exploreDescription.classList.toggle("expanded");
+
+  exploreReadMore.textContent = isExpanded ? "Show less ↑" : "Read more ↓";
+
+  exploreReadMore.setAttribute("aria-expanded", String(isExpanded));
+});
+
 // ==========================================
-// 11. ADD TO WATCHLIST
+// 11. ADD / REMOVE FROM WATCHLIST
 // ==========================================
 
 addToWatchlistButton.addEventListener("click", () => {
   if (!selectedAnime) return;
 
-  const alreadyAdded = watchlist.some((item) => item.id === selectedAnime.id);
+  // Check whether the anime already exists.
+  const existingIndex = watchlist.findIndex(
+    (item) => item.id === selectedAnime.id,
+  );
 
-  if (alreadyAdded) return;
+  if (existingIndex !== -1) {
+    // Remove anime from Watchlist.
+    watchlist.splice(existingIndex, 1);
 
-  watchlist.push(selectedAnime);
+    addToWatchlistButton.textContent = "Add to Watchlist";
+  } else {
+    // Add anime to Watchlist.
+    watchlist.push(selectedAnime);
 
+    addToWatchlistButton.textContent = "Remove from Watchlist";
+  }
+
+  // Save updated Watchlist.
   localStorage.setItem("hype-watchlist", JSON.stringify(watchlist));
 
-  addToWatchlistButton.textContent = "Added to Watchlist";
-
-  addToWatchlistButton.disabled = true;
+  // Refresh Watchlist UI.
+  renderWatchlist();
 });
 
 // ==========================================
@@ -607,7 +653,7 @@ undoButton.addEventListener("click", () => {
   removedIndex = -1;
 });
 
-// Initial Watchlist rendering
+// Initial Watchlist rendering.
 renderWatchlist();
 
 // ==========================================
@@ -623,29 +669,29 @@ const homeLink = document.getElementById("home-link");
 const watchlistLink = document.getElementById("watchlist-link");
 
 function showView(view) {
-  // Hide every page
+  // Hide every page.
   document.querySelectorAll(".page-view").forEach((page) => {
     page.classList.remove("active");
   });
 
-  // Show selected page
+  // Show selected page.
   view.classList.add("active");
 
-  // Scroll to the top
+  // Scroll to the top.
   window.scrollTo({
     top: 0,
     behavior: "smooth",
   });
 }
 
-// Open Home
+// Open Home.
 homeLink.addEventListener("click", (event) => {
   event.preventDefault();
 
   showView(homeView);
 });
 
-// Open Watchlist
+// Open Watchlist.
 watchlistLink.addEventListener("click", (event) => {
   event.preventDefault();
 
@@ -654,7 +700,7 @@ watchlistLink.addEventListener("click", (event) => {
   renderWatchlist();
 });
 
-// Show Home initially
+// Show Home initially.
 showView(homeView);
 
 // ==========================================
@@ -667,7 +713,7 @@ const previousButton = document.getElementById("for-you-prev");
 
 const nextButton = document.getElementById("for-you-next");
 
-// Move carousel left
+// Move carousel left.
 previousButton.addEventListener("click", () => {
   forYouCarousel.scrollBy({
     left: -forYouCarousel.clientWidth * 0.8,
@@ -675,7 +721,7 @@ previousButton.addEventListener("click", () => {
   });
 });
 
-// Move carousel right
+// Move carousel right.
 nextButton.addEventListener("click", () => {
   forYouCarousel.scrollBy({
     left: forYouCarousel.clientWidth * 0.8,
@@ -683,7 +729,7 @@ nextButton.addEventListener("click", () => {
   });
 });
 
-// Update arrow states
+// Update arrow states.
 function updateCarouselButtons() {
   previousButton.disabled = forYouCarousel.scrollLeft <= 0;
 
@@ -692,10 +738,11 @@ function updateCarouselButtons() {
     forYouCarousel.scrollWidth - 1;
 }
 
-// Listen for scrolling
+// Listen for scrolling.
 forYouCarousel.addEventListener("scroll", updateCarouselButtons);
 
-// Initial button state
+// Initial button state.
 updateCarouselButtons();
-// Recalculate arrow states when the window is resized
+
+// Recalculate arrow states when the window is resized.
 window.addEventListener("resize", updateCarouselButtons);
