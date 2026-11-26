@@ -62,7 +62,21 @@ function setExploreDescription(description) {
 // WATCHLIST STORAGE
 // ==========================================
 
+// ==========================================
+// WATCHLIST STORAGE
+// ==========================================
+
 let watchlist = JSON.parse(localStorage.getItem("hype-watchlist")) || [];
+
+// Add default status and progress to older saved anime.
+watchlist = watchlist.map((anime) => ({
+  ...anime,
+  status: anime.status || "Plan to Watch",
+  progress: anime.progress || 0,
+}));
+
+// Save the updated data structure.
+localStorage.setItem("hype-watchlist", JSON.stringify(watchlist));
 
 // ==========================================
 // 2. ANILIST GRAPHQL QUERY
@@ -531,8 +545,11 @@ addToWatchlistButton.addEventListener("click", () => {
     addToWatchlistButton.textContent = "Add to Watchlist";
   } else {
     // Add anime to Watchlist.
-    watchlist.push(selectedAnime);
-
+    watchlist.push({
+      ...selectedAnime,
+      status: "Plan to Watch",
+      progress: 0,
+    });
     addToWatchlistButton.textContent = "Remove from Watchlist";
   }
 
@@ -543,61 +560,178 @@ addToWatchlistButton.addEventListener("click", () => {
   renderWatchlist();
 });
 
-// ==========================================
-// 12. RENDER WATCHLIST
-// ==========================================
-
 function renderWatchlist() {
   watchlistContainer.innerHTML = "";
 
   if (watchlist.length === 0) {
     emptyWatchlist.classList.add("active");
-
     return;
   }
 
   emptyWatchlist.classList.remove("active");
 
   watchlist.forEach((item) => {
-    const card = document.createElement("article");
+    // Ensure older saved entries have the required properties.
+    item.status = item.status || "Plan to Watch";
+    item.progress = Number(item.progress) || 0;
 
+    const totalEpisodes = parseInt(item.episodes, 10);
+
+    const hasEpisodeCount = Number.isFinite(totalEpisodes) && totalEpisodes > 0;
+    // Keep progress within the valid range when episode count is known.
+    if (hasEpisodeCount) {
+      item.progress = Math.min(item.progress, totalEpisodes);
+    }
+
+    const percentage = hasEpisodeCount
+      ? Math.min((item.progress / totalEpisodes) * 100, 100)
+      : 0;
+
+    const card = document.createElement("article");
     card.classList.add("content-card");
 
     card.innerHTML = `
-            <div class="poster">
-                <img
-                    src="${item.image || ""}"
-                    alt="${item.title}"
-                >
-            </div>
+      <div class="poster">
+        <img
+          src="${item.image || ""}"
+          alt="${item.title}"
+        >
+      </div>
 
-            <div class="card-info">
-                <h3>${item.title}</h3>
+      <div class="card-info">
+        <h3>${item.title}</h3>
 
-                <div class="anime-meta">
-                    <span>
-                        ⭐ ${
-                          item.rating ? (item.rating / 10).toFixed(1) : "N/A"
-                        }
-                    </span>
+        <div class="anime-meta">
+          <span>
+            ⭐ ${item.rating ? (item.rating / 10).toFixed(1) : "N/A"}
+          </span>
 
-                    <span>
-                        ${item.episodes ?? "Episodes TBA"}
-                    </span>
-                </div>
+          <span>
+            ${item.episodes ?? "Episodes TBA"}
+          </span>
+        </div>
 
-                <button class="remove-watchlist" type="button">
-                    <i data-lucide="trash-2"></i>
-                    <span>Remove</span>
-                </button>
-            </div>
-        `;
+        <label class="watch-status-label" for="status-${item.id}">
+          Watch Status
+        </label>
 
-    const removeButton = card.querySelector(".remove-watchlist");
+        <select
+          class="watch-status-select"
+          id="status-${item.id}"
+          data-anime-id="${item.id}"
+        >
+          <option value="Plan to Watch" ${
+            item.status === "Plan to Watch" ? "selected" : ""
+          }>Plan to Watch</option>
+
+          <option value="Watching" ${
+            item.status === "Watching" ? "selected" : ""
+          }>Watching</option>
+
+          <option value="Completed" ${
+            item.status === "Completed" ? "selected" : ""
+          }>Completed</option>
+
+          <option value="Dropped" ${
+            item.status === "Dropped" ? "selected" : ""
+          }>Dropped</option>
+        </select>
+
+        <div class="episode-progress">
+          <div class="episode-progress-heading">
+            <span>Episode Progress</span>
+            <span class="episode-count">
+             ${item.progress} / ${hasEpisodeCount ? totalEpisodes : "TBA"}
+            </span>
+          </div>
+
+          <div class="progress-track">
+            <div
+              class="progress-fill"
+              style="width: ${percentage}%"
+            ></div>
+          </div>
+
+          <div class="episode-controls">
+            <button
+              class="episode-btn decrease-episode"
+              type="button"
+              aria-label="Decrease episode progress"
+              ${item.progress <= 0 ? "disabled" : ""}
+            >
+              −
+            </button>
+
+            <span>Episodes watched</span>
+
+            <button
+              class="episode-btn increase-episode"
+              type="button"
+              aria-label="Increase episode progress"
+              ${hasEpisodeCount && item.progress >= totalEpisodes ? "disabled" : ""}
+            >
+              +
+            </button>
+          </div>
+        </div>
+
+        <button class="remove-watchlist" type="button">
+          <i data-lucide="trash-2"></i>
+          <span>Remove</span>
+        </button>
+      </div>
+    `;
+
+    // ==========================================
+    // UPDATE WATCH STATUS
+    // ==========================================
+
+    const statusSelect = card.querySelector(".watch-status-select");
+
+    statusSelect.addEventListener("change", (event) => {
+      item.status = event.target.value;
+
+      localStorage.setItem("hype-watchlist", JSON.stringify(watchlist));
+    });
+
+    // ==========================================
+    // UPDATE EPISODE PROGRESS
+    // ==========================================
+
+    const updateProgress = (change) => {
+      const newProgress = item.progress + change;
+
+      if (newProgress < 0) return;
+
+      if (hasEpisodeCount && newProgress > totalEpisodes) return;
+
+      item.progress = newProgress;
+
+      // Automatically mark anime as completed.
+      if (hasEpisodeCount && item.progress === totalEpisodes) {
+        item.status = "Completed";
+      } else if (item.status === "Completed") {
+        item.status = "Watching";
+      }
+
+      localStorage.setItem("hype-watchlist", JSON.stringify(watchlist));
+
+      renderWatchlist();
+    };
+
+    card.querySelector(".increase-episode").addEventListener("click", () => {
+      updateProgress(1);
+    });
+
+    card.querySelector(".decrease-episode").addEventListener("click", () => {
+      updateProgress(-1);
+    });
 
     // ==========================================
     // REMOVE ANIME FROM WATCHLIST
     // ==========================================
+
+    const removeButton = card.querySelector(".remove-watchlist");
 
     removeButton.addEventListener("click", () => {
       removedIndex = watchlist.findIndex((anime) => anime.id === item.id);
@@ -620,7 +754,6 @@ function renderWatchlist() {
         watchlistToast.classList.remove("active");
 
         removedAnime = null;
-
         removedIndex = -1;
       }, 5000);
     });
