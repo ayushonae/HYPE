@@ -62,10 +62,6 @@ function setExploreDescription(description) {
 // WATCHLIST STORAGE
 // ==========================================
 
-// ==========================================
-// WATCHLIST STORAGE
-// ==========================================
-
 let watchlist = JSON.parse(localStorage.getItem("hype-watchlist")) || [];
 
 // Add default status and progress to older saved anime.
@@ -77,6 +73,9 @@ watchlist = watchlist.map((anime) => ({
 
 // Save the updated data structure.
 localStorage.setItem("hype-watchlist", JSON.stringify(watchlist));
+
+// Currently selected Watchlist filter.
+let currentWatchlistFilter = "All";
 
 // ==========================================
 // 2. ANILIST GRAPHQL QUERY
@@ -288,6 +287,7 @@ const anime = [
     genres: ["Action", "Drama"],
   },
 ];
+
 // ==========================================
 // 7. FETCH DYNAMIC FEATURED ANIME
 // ==========================================
@@ -550,6 +550,7 @@ addToWatchlistButton.addEventListener("click", () => {
       status: "Plan to Watch",
       progress: 0,
     });
+
     addToWatchlistButton.textContent = "Remove from Watchlist";
   }
 
@@ -560,17 +561,36 @@ addToWatchlistButton.addEventListener("click", () => {
   renderWatchlist();
 });
 
+// ==========================================
+// 12. RENDER WATCHLIST
+// ==========================================
+
 function renderWatchlist() {
+  // Keep the homepage section synchronized with the Watchlist.
+  renderContinueWatching();
+
   watchlistContainer.innerHTML = "";
 
-  if (watchlist.length === 0) {
+  const filteredWatchlist =
+    currentWatchlistFilter === "All"
+      ? watchlist
+      : watchlist.filter((item) => item.status === currentWatchlistFilter);
+
+  if (filteredWatchlist.length === 0) {
+    emptyWatchlist.textContent =
+      watchlist.length === 0
+        ? "Your watchlist is empty. Explore something new!"
+        : "No anime found in this category.";
+
     emptyWatchlist.classList.add("active");
     return;
   }
 
   emptyWatchlist.classList.remove("active");
+  emptyWatchlist.textContent =
+    "Your watchlist is empty. Explore something new!";
 
-  watchlist.forEach((item) => {
+  filteredWatchlist.forEach((item) => {
     // Ensure older saved entries have the required properties.
     item.status = item.status || "Plan to Watch";
     item.progress = Number(item.progress) || 0;
@@ -578,6 +598,7 @@ function renderWatchlist() {
     const totalEpisodes = parseInt(item.episodes, 10);
 
     const hasEpisodeCount = Number.isFinite(totalEpisodes) && totalEpisodes > 0;
+
     // Keep progress within the valid range when episode count is known.
     if (hasEpisodeCount) {
       item.progress = Math.min(item.progress, totalEpisodes);
@@ -588,6 +609,7 @@ function renderWatchlist() {
       : 0;
 
     const card = document.createElement("article");
+
     card.classList.add("content-card");
 
     card.innerHTML = `
@@ -641,7 +663,7 @@ function renderWatchlist() {
           <div class="episode-progress-heading">
             <span>Episode Progress</span>
             <span class="episode-count">
-             ${item.progress} / ${hasEpisodeCount ? totalEpisodes : "TBA"}
+              ${item.progress} / ${hasEpisodeCount ? totalEpisodes : "TBA"}
             </span>
           </div>
 
@@ -692,6 +714,10 @@ function renderWatchlist() {
       item.status = event.target.value;
 
       localStorage.setItem("hype-watchlist", JSON.stringify(watchlist));
+
+      // Re-render both sections. The card may disappear if it no longer
+      // matches the currently selected filter.
+      renderWatchlist();
     });
 
     // ==========================================
@@ -707,7 +733,7 @@ function renderWatchlist() {
 
       item.progress = newProgress;
 
-      // Automatically mark anime as completed.
+      // Automatically update status when progress reaches the final episode.
       if (hasEpisodeCount && item.progress === totalEpisodes) {
         item.status = "Completed";
       } else if (item.status === "Completed") {
@@ -759,8 +785,99 @@ function renderWatchlist() {
     });
 
     watchlistContainer.appendChild(card);
+  });
 
+  // Recreate Lucide icons for newly rendered cards.
+  if (window.lucide) {
     lucide.createIcons();
+  }
+}
+
+// ==========================================
+// WATCHLIST FILTER BUTTONS
+// ==========================================
+
+const watchlistFilters = document.querySelectorAll(".watchlist-filter");
+
+watchlistFilters.forEach((button) => {
+  button.addEventListener("click", () => {
+    currentWatchlistFilter = button.dataset.filter;
+
+    watchlistFilters.forEach((filter) => {
+      filter.classList.remove("active");
+    });
+
+    button.classList.add("active");
+
+    renderWatchlist();
+  });
+});
+
+// ==========================================
+// CONTINUE WATCHING SECTION
+// ==========================================
+
+function renderContinueWatching() {
+  const continueContainer = document.getElementById("continue-watching");
+  const continueEmpty = document.getElementById("continue-empty");
+
+  // Safely exit if the matching HTML elements have not been added yet.
+  if (!continueContainer || !continueEmpty) return;
+
+  const watchingAnime = watchlist.filter((item) => item.status === "Watching");
+
+  continueContainer.innerHTML = "";
+
+  if (watchingAnime.length === 0) {
+    continueEmpty.style.display = "block";
+    return;
+  }
+
+  continueEmpty.style.display = "none";
+
+  watchingAnime.forEach((item) => {
+    const totalEpisodes = parseInt(item.episodes, 10);
+
+    const hasEpisodeCount = Number.isFinite(totalEpisodes) && totalEpisodes > 0;
+
+    const progress = Number(item.progress) || 0;
+
+    const percentage = hasEpisodeCount
+      ? Math.min((progress / totalEpisodes) * 100, 100)
+      : 0;
+
+    const card = document.createElement("article");
+
+    card.classList.add("content-card");
+
+    card.innerHTML = `
+      <div class="poster">
+        <img
+          src="${item.image || ""}"
+          alt="${item.title}"
+        >
+      </div>
+
+      <div class="card-info">
+        <h3>${item.title}</h3>
+
+        <div class="continue-progress-info">
+          <span>Episode ${progress}</span>
+          <span>
+            ${hasEpisodeCount ? `of ${totalEpisodes}` : "of TBA"}
+          </span>
+        </div>
+
+        <div class="progress-track">
+          <div
+            class="progress-fill"
+            style="width: ${percentage}%"
+          ></div>
+        </div>
+      </div>
+    `;
+
+    continueContainer.appendChild(card);
   });
 }
 

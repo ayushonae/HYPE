@@ -80,11 +80,15 @@
         </section>
 
         <!-- CONTINUE WATCHING -->
-        <section>
+        <section class="continue-section">
           <h2>Continue Watching</h2>
-          <div class="content-grid" id="continue-watching"></div>
-        </section>
 
+          <div class="content-grid" id="continue-watching"></div>
+
+          <p id="continue-empty" class="section-status">
+            Anime you're currently watching will appear here.
+          </p>
+        </section>
         <!-- FOR YOU -->
         <section class="for-you-section">
           <div class="carousel-heading">
@@ -135,6 +139,22 @@
         <div class="section-heading">
           <h2>Your Watchlist</h2>
           <p>Your personal collection of anime.</p>
+        </div>
+        <!-- WATCHLIST FILTERS -->
+        <div class="watchlist-filters">
+          <button class="watchlist-filter active" data-filter="All">All</button>
+          <button class="watchlist-filter" data-filter="Plan to Watch">
+            Plan to Watch
+          </button>
+          <button class="watchlist-filter" data-filter="Watching">
+            Watching
+          </button>
+          <button class="watchlist-filter" data-filter="Completed">
+            Completed
+          </button>
+          <button class="watchlist-filter" data-filter="Dropped">
+            Dropped
+          </button>
         </div>
 
         <div class="content-grid" id="watchlist-container">
