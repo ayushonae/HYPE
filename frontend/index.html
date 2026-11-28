@@ -124,8 +124,43 @@
         </section>
 
         <!-- TODAY'S PICK -->
-        <section>
+        <section class="today-pick-section">
           <h2>Today's Pick</h2>
+          <p class="today-pick-subtitle">One recommendation worth your time.</p>
+
+          <p id="today-pick-status" class="section-status">
+            Finding today's pick...
+          </p>
+
+          <div class="today-pick-card" id="today-pick-card" hidden>
+            <div class="today-pick-image-wrap">
+              <img id="today-pick-image" src="" alt="Today's anime pick" />
+            </div>
+
+            <div class="today-pick-content">
+              <span class="today-pick-label">HYPE DAILY DISCOVERY</span>
+
+              <h3 id="today-pick-title">Loading...</h3>
+
+              <p id="today-pick-description"></p>
+
+              <div class="today-pick-meta">
+                <span id="today-pick-rating">⭐ --</span>
+                <span id="today-pick-episodes">-- Episodes</span>
+              </div>
+
+              <div class="today-pick-genres" id="today-pick-genres"></div>
+
+              <button
+                type="button"
+                class="today-pick-explore"
+                id="today-pick-explore"
+              >
+                <i data-lucide="compass"></i>
+                Explore Pick
+              </button>
+            </div>
+          </div>
         </section>
 
         <!-- UPCOMING -->

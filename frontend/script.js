@@ -35,6 +35,7 @@ let removedIndex = -1;
 let toastTimeout;
 
 let selectedAnime = null;
+let todayPickAnime = null;
 
 // Reset the Explore description whenever a different anime is opened.
 function setExploreDescription(description) {
@@ -56,6 +57,76 @@ function setExploreDescription(description) {
 
     exploreReadMore.hidden = !isOverflowing;
   });
+}
+
+// ==========================================
+// TODAY'S PICK
+// ==========================================
+
+function renderTodaysPick(animeList) {
+  const todayPickCard = document.getElementById("today-pick-card");
+  const todayPickStatus = document.getElementById("today-pick-status");
+
+  const todayPickImage = document.getElementById("today-pick-image");
+  const todayPickTitle = document.getElementById("today-pick-title");
+  const todayPickDescription = document.getElementById(
+    "today-pick-description",
+  );
+  const todayPickRating = document.getElementById("today-pick-rating");
+  const todayPickEpisodes = document.getElementById("today-pick-episodes");
+  const todayPickGenres = document.getElementById("today-pick-genres");
+
+  if (!animeList || animeList.length === 0) return;
+
+  // Calculate the day number of the current year.
+  const now = new Date();
+  const startOfYear = new Date(now.getFullYear(), 0, 0);
+
+  const dayOfYear = Math.floor((now - startOfYear) / (1000 * 60 * 60 * 24));
+
+  // Select a consistent anime for each day.
+  const pickIndex = (dayOfYear - 1) % animeList.length;
+
+  todayPickAnime = animeList[pickIndex];
+
+  // Display poster and title.
+  todayPickImage.src = todayPickAnime.coverImage.large;
+  todayPickImage.alt = todayPickAnime.title.romaji;
+
+  todayPickTitle.textContent = todayPickAnime.title.romaji;
+
+  // Convert the API description into readable text.
+  const temporaryElement = document.createElement("div");
+
+  temporaryElement.innerHTML =
+    todayPickAnime.description || "No description available.";
+
+  todayPickDescription.textContent =
+    temporaryElement.textContent || "No description available.";
+
+  // Display rating and episode count.
+  todayPickRating.textContent = todayPickAnime.averageScore
+    ? `⭐ ${(todayPickAnime.averageScore / 10).toFixed(1)}`
+    : "⭐ N/A";
+
+  todayPickEpisodes.textContent = todayPickAnime.episodes
+    ? `${todayPickAnime.episodes} Episodes`
+    : "Episodes TBA";
+
+  // Display genres.
+  todayPickGenres.innerHTML = "";
+
+  todayPickAnime.genres.forEach((genre) => {
+    const genreTag = document.createElement("span");
+
+    genreTag.textContent = genre;
+
+    todayPickGenres.appendChild(genreTag);
+  });
+
+  // Show the completed card.
+  todayPickStatus.style.display = "none";
+  todayPickCard.hidden = false;
 }
 
 // ==========================================
@@ -342,6 +413,62 @@ fetch("https://graphql.anilist.co", {
     if (featuredAnimeList.length === 0) {
       throw new Error("No featured anime found.");
     }
+
+    // Render Today's Pick using the same AniList results.
+    renderTodaysPick(featuredAnimeList);
+
+    // Open Today's Pick in the existing Explore panel.
+    document
+      .getElementById("today-pick-explore")
+      .addEventListener("click", () => {
+        if (!todayPickAnime) return;
+
+        const item = todayPickAnime;
+
+        selectedAnime = {
+          id: item.id,
+          title: item.title.romaji,
+          image: item.coverImage.large,
+          rating: item.averageScore,
+          episodes: item.episodes,
+          genres: item.genres,
+        };
+
+        exploreImage.src = item.coverImage.large;
+        exploreImage.alt = item.title.romaji;
+
+        exploreTitle.textContent = item.title.romaji;
+
+        setExploreDescription(item.description);
+
+        exploreRating.textContent = item.averageScore
+          ? `⭐ ${(item.averageScore / 10).toFixed(1)}`
+          : "⭐ N/A";
+
+        exploreEpisodes.textContent = item.episodes ?? "Episodes TBA";
+
+        exploreGenres.innerHTML = "";
+
+        item.genres.forEach((genre) => {
+          const genreTag = document.createElement("span");
+
+          genreTag.textContent = genre;
+
+          exploreGenres.appendChild(genreTag);
+        });
+
+        const alreadyAdded = watchlist.some(
+          (anime) => anime.id === selectedAnime.id,
+        );
+
+        addToWatchlistButton.textContent = alreadyAdded
+          ? "Remove from Watchlist"
+          : "Add to Watchlist";
+
+        addToWatchlistButton.disabled = false;
+
+        exploreOverlay.classList.add("active");
+      });
 
     // ==========================================
     // SELECT A RANDOM ANIME
